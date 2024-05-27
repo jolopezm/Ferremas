@@ -1,15 +1,13 @@
-version: '3'
-
 services:
   postgres:
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: joLopezm3104.
+      POSTGRES_PASSWORD: test1234
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-    volumen:
+    volumes:
       - postgres_data:/var/lib/postgresql/data
 volumes:
   postgres_data: 
