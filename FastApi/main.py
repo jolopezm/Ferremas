@@ -1,12 +1,25 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Annotated
 import models
 from db import engine, session
 from sqlalchemy.orm import Session
-#this is a test
 
 app = FastAPI()
+
+origins = [
+    'http://localhost:3000'
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+)
+
 models.Base.metadata.create_all(bind=engine)
 
 class ProductoBase(BaseModel):
