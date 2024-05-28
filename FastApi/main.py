@@ -31,14 +31,6 @@ class ProductoBase(BaseModel):
 def index():
     return {"message": "hola."}
 
-@app.get('/producto/{id}')
-def mostrar_producto(id: int):
-    return {"data": id}
-
-@app.post('/insertar-producto')
-def insertar_producto(producto: ProductoBase):
-    return {"message": f"producto {producto.nombre} ha sido insertado."}
-
 def get_db():
     db = session()
     try:
@@ -48,14 +40,13 @@ def get_db():
 
 db_dependecy = Annotated[Session, Depends(get_db)]
 
-@app.get("/productos/{producto_id}")
-async def read_producto(producto_id: int, db: db_dependecy):
-    result = db.query(models.Producto).filter(models.Producto.id == producto_id).first
-    if not result:
-        raise HTTPException(status_code = 404, detail = 'Producto no encontrado')
-    return result
+@app.get("/productos")
+async def get_productos(db: db_dependecy):
+    productos = db.query(models.Producto).all()
+    productos_nombres = [producto.nombre for producto in productos]
+    return {"productos_nombres": productos_nombres}
 
-@app.post("/productos/")
+@app.post("/crea-productos")
 async def create_producto(producto: ProductoBase, db: db_dependecy):
     db_producto = models.Producto(nombre=producto.nombre, precio=producto.precio, cantidad=producto.cantidad)
     db.add(db_producto)

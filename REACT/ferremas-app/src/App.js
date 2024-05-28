@@ -1,5 +1,8 @@
 import React, {useState, useEffect} from "react"
 import api from './api'
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import Home from './pages/home'
+import About from "./pages/about";
 
 const App = () => {
   const [productos, setProductos] = useState([]);
@@ -11,7 +14,7 @@ const App = () => {
 
   const fetchProductos = async () => {
     try {
-      const response = await api.get('/productos/');
+      const response = await api.get('/productos');
       if (response.status === 200) {
         setProductos(response.data);
       } else {
@@ -38,7 +41,7 @@ const App = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    await api.post('/productos/', formData);
+    await api.post('/productos', formData);
     fetchProductos();
     setFormData({
       nombre: '',
@@ -49,74 +52,13 @@ const App = () => {
 
   return (
     <div>
-
-      <nav className="navbar navbar-dark bg-primary">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            Ferremas
-          </a>
-        </div>
-      </nav>
-
-      <div className="container">
-        <form onSubmit={handleFormSubmit}>
-          <div className="mb-3 mt-3">
-            <label htmlFor='nombre' className='form-label'>
-              nombre
-            </label>
-            <input type='text' className="form-control" id='nombre' name='nombre' onChange={handleInputChange} value={formData.nombre}></input>
-          </div>
-        </form>
-      </div>
-
-      <div className="container">
-        <form onSubmit={handleFormSubmit}>
-          <div className="mb-3">
-            <label htmlFor='precio' className='form-label'>
-              precio
-            </label>
-            <input type='integer' className="form-control" id='precio' name='precio' onChange={handleInputChange} value={formData.precio}></input>
-          </div>
-        </form>
-      </div>
-
-      <div className="container">
-        <form onSubmit={handleFormSubmit}>
-          <div className="mb-3">
-            <label htmlFor='cantidad' className='form-label'>
-              cantidad
-            </label>
-            <input type='integer' className="form-control" id='cantidad' name='cantidad' onChange={handleInputChange} value={formData.cantidad}></input>
-          </div>
-        </form>
-      </div>
-
-      <div className="container">
-      <button type='submit' className="btn btn-primary">
-          submit
-        </button>
-      </div>
-
-      <div className="container">
-        <table className="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>nombre</th>
-            <th>precio</th>
-            <th>cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((producto => (
-            <tr key={producto.id}>
-              <td>{producto.nombre}</td>
-              <td>{producto.precio}</td>
-              <td>{producto.cantidad}</td>
-            </tr>
-          )))}
-        </tbody>
-        </table>
-      </div>
+      <BrowserRouter>
+      <Routes>
+        <Route index element={<Home></Home>}></Route>
+        <Route path='/home' element={<Home></Home>}></Route>
+        <Route path='/about' element={<About></About>}></Route>
+      </Routes>
+      </BrowserRouter>
     </div>
   )
 }
