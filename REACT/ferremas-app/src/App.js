@@ -3,6 +3,7 @@ import api from './api'
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Home from './pages/home'
 import About from "./pages/about";
+import NotFound from "./pages/notfound";
 
 const App = () => {
   const [productos, setProductos] = useState([]);
@@ -57,6 +58,7 @@ const App = () => {
         <Route index element={<Home></Home>}></Route>
         <Route path='/home' element={<Home></Home>}></Route>
         <Route path='/about' element={<About></About>}></Route>
+        <Route path='*' element={<NotFound></NotFound>}></Route>
       </Routes>
       </BrowserRouter>
     </div>

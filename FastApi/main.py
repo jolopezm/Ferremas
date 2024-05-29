@@ -43,14 +43,26 @@ db_dependecy = Annotated[Session, Depends(get_db)]
 @app.get("/productos")
 async def get_productos(db: db_dependecy):
     productos = db.query(models.Producto).all()
-    productos_nombres = [producto.nombre for producto in productos]
-    return {"productos_nombres": productos_nombres}
+    productos_data = [producto.as_dict() for producto in productos]
+    return {"productos": productos_data}
+
+@app.get("/productos/{item_id}")
+async def get_producto_by_id(item_id: int, db: db_dependecy):
+    producto = db.query(models.Producto).filter_by(id=item_id).first()
+    if producto is None:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    return {"producto": producto.as_dict()}
 
 @app.post("/crea-productos")
 async def create_producto(producto: ProductoBase, db: db_dependecy):
-    db_producto = models.Producto(nombre=producto.nombre, precio=producto.precio, cantidad=producto.cantidad)
-    db.add(db_producto)
-    db.commit()
-    db.refresh(db_producto)
-    return {"message": f"Producto {producto.nombre} ha sido creado."}
+    try:
+        db_producto = models.Producto(nombre=producto.nombre, precio=producto.precio, cantidad=producto.cantidad)
+        db.add(db_producto)
+        db.commit()
+        db.refresh(db_producto)
+        return {"message": f"Producto {producto.nombre} ha sido creado."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear producto: {e}")
     
+
+
