@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, Annotated
-import models
+import models, requests
 from db import engine, session
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from dollarRate import get_dollar_rate
 
 app = FastAPI()
 
@@ -63,6 +66,11 @@ async def create_producto(producto: ProductoBase, db: db_dependecy):
         return {"message": f"Producto {producto.nombre} ha sido creado."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear producto: {e}")
+
+@app.get("/dollar-rate")
+def read_dollar_rate():
+    rate = get_dollar_rate()
+    return {"dollar_rate": rate}
     
 
 
