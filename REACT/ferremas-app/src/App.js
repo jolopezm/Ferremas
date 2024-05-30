@@ -1,9 +1,11 @@
-import React, {useState, useEffect} from "react"
-import api from './api'
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import Home from './pages/home'
+import React, { useState, useEffect } from "react";
+import api, { initTransaction } from './api';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/home';
 import About from "./pages/about";
 import NotFound from "./pages/notfound";
+import Approved from "./components/Approved";
+import Rejected from "./components/Rejected";
 
 const App = () => {
   const [productos, setProductos] = useState([]);
@@ -26,7 +28,6 @@ const App = () => {
       // Aquí puedes manejar el error según tus necesidades (por ejemplo, mostrar un mensaje al usuario).
     }
   };
-  
 
   useEffect(() => {
     fetchProductos();
@@ -54,15 +55,17 @@ const App = () => {
   return (
     <div>
       <BrowserRouter>
-      <Routes>
-        <Route index element={<Home></Home>}></Route>
-        <Route path='/home' element={<Home></Home>}></Route>
-        <Route path='/about' element={<About></About>}></Route>
-        <Route path='*' element={<NotFound></NotFound>}></Route>
-      </Routes>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/approved' element={<Approved />} />
+          <Route path='/rejected' element={<Rejected />} />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </div>
-  )
-}
+  );
+};
 
 export default App;

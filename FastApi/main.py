@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Annotated, Optional
-import models, os
+import models, os, requests
 from db import engine, session
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -150,3 +150,14 @@ async def update_producto(
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al actualizar producto: {e}")
+    
+@app.post("/api/init-transaction")
+async def init_transaction(data: dict):
+    url = "https://webpay3gint.transbank.cl/rswebpaytransaction/api/webpay/v1.0/transactions"
+    headers = {
+        'Tbk-Api-Key-Id': '597055555532',
+        'Tbk-Api-Key-Secret': '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C',
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(url, json=data, headers=headers)
+    return response.json()

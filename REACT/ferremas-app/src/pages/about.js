@@ -1,49 +1,57 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/header";
+import Payment from "../components/Payment";
+import { initTransaction } from '../api';
 
 export default function About() {
-    // Obtener la imagen del producto desde el backend
-    async function obtenerImagenProducto() {
-        const productoId = 13; // ID del producto, ajustar según tu caso
-        const url = `/productos/${productoId}/imagen`;
+  const [transactionResult, setTransactionResult] = useState(null);
+  const [transactionData, setTransactionData] = useState(null);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (response.ok) {
-                const imagenUrl = data.imagen;
-
-                // Crear un elemento <img> y establecer su atributo src
-                const imagenElement = document.createElement("img");
-                imagenElement.src = imagenUrl;
-
-                // Agregar la imagen al contenedor en el HTML
-                document.getElementById("imagen-producto").appendChild(imagenElement);
-            } else {
-                console.error(`Error: ${data.detail}`);
-            }
-        } catch (error) {
-            console.error("Error al obtener la imagen del producto:", error);
-        }
+  useEffect(() => {
+    if (transactionResult === 'approved') {
+      navigate('/approved');
+    } else if (transactionResult === 'rejected') {
+      navigate('/rejected');
     }
+  }, [transactionResult, navigate]);
 
-    // Llamar a la función para obtener la imagen del producto al cargar la página
-    useEffect(() => {
-        obtenerImagenProducto();
-    }, []); // Vacío para que se ejecute solo una vez al cargar el componente
+  const handleInitTransaction = async () => {
+    const baseurl = window.location.origin;
+    try {
+      const data = {
+        buy_order: String(Math.floor(Math.random() * 1000000)),
+        session_id: String(Math.floor(Math.random() * 1000000)),
+        amount: 15000,
+        return_url: `${baseurl}/return`
+      };
+      const responseData = await initTransaction(data);
+      setTransactionData(responseData);
+      setTransactionResult(responseData.transaction_result);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
-    return (
-        <>
-            <Header />
-            <div className='container'>
-                <div className='mb-3 mt-3'>
-                    <h1>about page</h1>
-                </div>
-                {/* Aquí se mostrará la imagen del producto */}
-                <div id="imagen-producto"></div>
-                <img src='https://res.cloudinary.com/drsfnq5io/image/upload/v1717044476/img-productos-ferremas/t0haehzve2ehdtvc9fw4.jpg'></img>
-            </div>
-        </>
-    );
+  return (
+    <>
+      <Header />
+      <div className='container'>
+        <div className='mb-3 mt-3'>
+          <h1>About Page</h1>
+          <button onClick={handleInitTransaction}>Iniciar Transacción</button>
+          {transactionData && (
+            <Payment
+              url_tbk={transactionData.url}
+              token={transactionData.token}
+              submit="Continuar!"
+            />
+          )}
+          {error && <div>Error: {error}</div>}
+        </div>
+      </div>
+    </>
+  );
 }
