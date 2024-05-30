@@ -1,7 +1,7 @@
 export default function Header() {
     return (
         <div>
-          <nav class="navbar navbar-expand-lg bg-body-tertiary">
+          <nav class="navbar navbar-expand-lg bg-body-tertiary" style={{ border: '1px solid #000000' }}>
             <div class="container-fluid">
               <a class="navbar-brand" href="http://localhost:3000/home">Ferremas</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
