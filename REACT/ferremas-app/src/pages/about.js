@@ -5,31 +5,20 @@ import Payment from "../components/Payment";
 import { initTransaction } from '../api';
 
 export default function About() {
-  const [transactionResult, setTransactionResult] = useState(null);
   const [transactionData, setTransactionData] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (transactionResult === 'approved') {
-      navigate('/approved');
-    } else if (transactionResult === 'rejected') {
-      navigate('/rejected');
-    }
-  }, [transactionResult, navigate]);
-
   const handleInitTransaction = async () => {
-    const baseurl = window.location.origin;
     try {
       const data = {
         buy_order: String(Math.floor(Math.random() * 1000000)),
         session_id: String(Math.floor(Math.random() * 1000000)),
         amount: 15000,
-        return_url: `${baseurl}/return`
+        return_url: 'http://localhost:3000/home'
       };
       const responseData = await initTransaction(data);
       setTransactionData(responseData);
-      setTransactionResult(responseData.transaction_result);
     } catch (error) {
       setError(error.message);
     }

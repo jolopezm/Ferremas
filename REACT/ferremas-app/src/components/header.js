@@ -1,19 +1,15 @@
 export default function Header() {
     return (
         <div>
-          <nav class="navbar navbar-expand-lg bg-body-tertiary" style={{ border: '1px solid #000000' }}>
-            <div class="container-fluid">
-              <a class="navbar-brand" href="http://localhost:3000/home">Ferremas</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                  <a class="nav-link" href="http://localhost:3000/home">Home</a>
-                  <a class="nav-link" href="http://localhost:3000/about">About</a>
-                </div>
-              </div>
-            </div>
+          <nav>
+            <ul>
+              <li><strong><h1>Ferremas</h1></strong></li>
+            </ul>
+            <ul>
+              <li><a href="http://localhost:3000/home">Home</a></li>
+              <li><a href="http://localhost:3000/about">About</a></li>
+              <li><a href="http://localhost:3000/docs">Docs</a></li>
+            </ul>
           </nav>
       </div>
     )

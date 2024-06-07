@@ -11,6 +11,8 @@ export const initTransaction = async (data) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
+
+      
     });
   
     if (!response.ok) {

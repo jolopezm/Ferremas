@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.product-name {
+  white-space: nowrap;      /* No permite que el texto haga un salto de línea */
+  overflow: hidden;         /* Oculta el texto que desborda */
+  text-overflow: ellipsis;  /* Añade los puntos suspensivos */
+  max-width: 100%;          /* Asegura que el nombre no exceda el tamaño del contenedor */
+}
+
+.product-img {
+  border-radius: 5px;
+  height: 150px;
+}

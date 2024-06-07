@@ -22,3 +22,23 @@ class Producto(Base):
             "imagen": base64.b64encode(self.imagen).decode('utf-8') if self.imagen else None,
             "imagen_url": self.imagen_url
         }
+    
+class Cliente(Base):
+    __tablename__ = "cliente"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, index=True)
+    email = Column(String)
+    password = Column(String)
+    direccion = Column(String)
+    is_logged_in = Column(Boolean, default=False)
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "email": self.email,
+            "password": self.password,
+            "direccion": self.direccion,
+            "is_logged_in": self.is_logged_in
+        }
+    
