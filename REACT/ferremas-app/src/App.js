@@ -1,10 +1,10 @@
 // App.js
 import React from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/home';
-import About from "./pages/about";
-import Docs from "./pages/docs";
-import NotFound from "./pages/notfound";
+import Home from './pages/Home';
+import About from "./pages/About";
+import Docs from "./pages/Docs";
+import NotFound from "./pages/NotFound";
 import Approved from "./components/Approved";
 import Rejected from "./components/Rejected";
 

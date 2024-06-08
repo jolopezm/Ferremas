@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from "../components/header";
+import Header from "../components/Header";
 import Payment from "../components/Payment";
-import { initTransaction } from '../api';
+import { initTransaction } from '../Api';
 
 export default function About() {
   const [transactionData, setTransactionData] = useState(null);
@@ -10,12 +10,13 @@ export default function About() {
   const navigate = useNavigate();
 
   const handleInitTransaction = async () => {
+
     try {
       const data = {
         buy_order: String(Math.floor(Math.random() * 1000000)),
         session_id: String(Math.floor(Math.random() * 1000000)),
-        amount: 15000,
-        return_url: 'http://localhost:3000/home'
+        amount: 20000,
+        return_url: 'http:localhost:3000/asdad'
       };
       const responseData = await initTransaction(data);
       setTransactionData(responseData);

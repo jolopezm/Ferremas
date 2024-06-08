@@ -1,15 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from typing import Annotated, Optional
-import models, os
+import models, schemas
+import os
 from db import engine, session
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from dollarRate import get_dollar_rate
-from imgConvertCompress import compress_image, convert_image_to_base64
 from transbank.webpay.webpay_plus.transaction import Transaction, IntegrationApiKeys, IntegrationCommerceCodes
 from transbank.common.integration_type import IntegrationType
 from transbank.common.options import WebpayOptions
@@ -42,27 +40,6 @@ app.add_middleware(
 
 models.Base.metadata.create_all(bind=engine)
 
-class ProductoBase(BaseModel):
-    nombre: str
-    precio: int
-    cantidad: int
-
-class ClienteBase(BaseModel):
-    nombre: str
-    email: str
-    password: str
-    direccion: str
-
-class TransactionRequestBase(BaseModel):
-    buy_order: str
-    session_id: str
-    amount: int
-    return_url: str
-
-class ConfirmTransactionRequest(BaseModel):
-    token: str
-
-
 def get_db():
     db = session()
     try:
@@ -91,28 +68,32 @@ async def get_producto_by_id(item_id: int, db: db_dependecy):
 @app.post("/crea-productos")
 async def create_producto(
     nombre: str = Form(...),
-    precio: float = Form(...),
+    precio: int = Form(...),
     cantidad: int = Form(...),
-    db: Session = Depends(get_db),
+    descripcion: str = Form(None),
     imagen: UploadFile = File(None),
-    imagen_url: str = Form(...)
+    imagen_url: str = Form(None),
+    categoria_id: int = Form(...),
+    db: Session = Depends(get_db)
 ):
     try:
-        # Verificar si se proporcionó una imagen
-        if imagen:
-            # Leer el contenido de la imagen y convertirlo a bytes
-            imagen_bytes = await imagen.read()
-        else:
-            # Si no se proporciona una imagen, establecer los bytes de imagen como None
-            imagen_bytes = None
+        # Verificar si la categoría existe
+        categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail="La categoría especificada no existe")
+        
+        # Convertir la imagen a bytes si está presente
+        imagen_bytes = await imagen.read() if imagen else None
         
         # Crear el producto en la base de datos
         db_producto = models.Producto(
             nombre=nombre, 
             precio=precio, 
             cantidad=cantidad, 
+            descripcion=descripcion,
             imagen=imagen_bytes,
-            imagen_url=imagen_url
+            imagen_url=imagen_url,
+            categoria_id=categoria_id
         )
         db.add(db_producto)
         db.commit()
@@ -126,16 +107,6 @@ async def create_producto(
 def read_dollar_rate():
     rate = get_dollar_rate()
     return {"dollar_rate": rate}
-
-@app.get("/productos/{producto_id}/imagen")
-async def get_imagen_producto(producto_id: int, db: Session = Depends(get_db)):
-    try:
-        producto = db.query(models.Producto).filter(models.Producto.id == producto_id).first()
-        if not producto or not producto.imagen_url:
-            raise HTTPException(status_code=404, detail="Producto no encontrado o sin imagen")
-        return {"imagen": f"/imagenes/{producto_id}.jpg"}  # Ruta de la imagen estática
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener la imagen del producto: {e}")
     
 @app.put("/actualiza-producto/{producto_id}")
 async def update_producto(
@@ -143,29 +114,36 @@ async def update_producto(
     nombre: Optional[str] = Form(None),
     precio: Optional[float] = Form(None),
     cantidad: Optional[int] = Form(None),
+    descripcion: Optional[str] = Form(None),
     imagen: UploadFile = File(None),
     imagen_url: Optional[str] = Form(None),
+    categoria_id: Optional[int] = Form(None),
     db: Session = Depends(get_db)
 ):
     try:
-        # Obtener el producto de la base de datos
+        categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail="La categoría especificada no existe")
+
         producto = db.query(models.Producto).filter(models.Producto.id == producto_id).first()
         if not producto:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
-
-        # Actualizar los campos solo si se proporcionan nuevos valores
+        
         if nombre is not None:
             producto.nombre = nombre
         if precio is not None:
             producto.precio = precio
         if cantidad is not None:
             producto.cantidad = cantidad
+        if descripcion is not None:
+            producto.descripcion = descripcion
         if imagen is not None:
             producto.imagen = await imagen.read()
         if imagen_url is not None:
             producto.imagen_url = imagen_url
+        if categoria_id is not None:
+            producto.categoria_id = categoria_id
 
-        # Guardar los cambios en la base de datos
         db.commit()
         db.refresh(producto)
 
@@ -211,18 +189,6 @@ async def sign_in(
         return {"message": f"Cliente {nombre} ha sido creado."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear cliente: {e}")
-    
-@app.post("/api/confirm-transaction")
-async def confirm_transaction(request: ConfirmTransactionRequest):
-    token = request.token
-    
-    tx = Transaction(webpay.WebpayOptions(webpay.IntegrationCommerceCodes.WEBPAY_PLUS, webpay.IntegrationApiKeys.WEBPAY, IntegrationType.TEST))
-    resp = tx.commit(token)
-    
-    if not resp or not resp.vci:
-        raise HTTPException(status_code=500, detail="Error al confirmar la transacción")
-    
-    return resp
 
 @app.delete("/elimina-producto/{producto_id}")
 async def delete_producto(producto_id: int, db: Session = Depends(get_db)):
@@ -238,3 +204,31 @@ async def delete_producto(producto_id: int, db: Session = Depends(get_db)):
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al eliminar producto: {e}")
+
+@app.post("/crea-categoria")
+async def create_categoria(
+    nombre: str = Form(...),
+    descripcion: str = Form(None),
+    db: Session = Depends(get_db)
+):
+    try:
+        categoria = db.query(models.Categoria).filter(models.Categoria.nombre == nombre).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail="La categoría especificada ya existe")
+
+        db_categoria = models.Categoria(
+            nombre=nombre, 
+            descripcion=descripcion,
+        )
+        db.add(db_categoria)
+        db.commit()
+        db.refresh(db_categoria)
+        
+        return {"message": f"Categoria {nombre} ha sido creada."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear categoria: {e}")
+    
+@app.get("/categorias/")
+async def get_categorias(db: Session = Depends(get_db)):
+    categorias = db.query(models.Categoria).all()
+    return {"categorias": [categoria.as_dict() for categoria in categorias]}

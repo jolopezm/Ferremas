@@ -7,7 +7,6 @@ export default function ShowInUSD({ showInUSD, onShowInUSDChange }) {
                 type="checkbox"
                 checked={showInUSD}
                 onChange={onShowInUSDChange}
-                
             />
             Mostrar precios en USD
         </label>

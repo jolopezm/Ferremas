@@ -16,12 +16,11 @@ export default function ProductCard({ product, showInUSD, dollarRate }) {
             
 
             <p class="product-name">{product.nombre}</p>
-            <b>Precio:</b> {getPriceInDollars(product.precio)} {showInUSD ? 'USD' : 'CLP'}
-            <button className="btn btn-dark">Agregar al carrito</button>
-
-            <footer>
-            <span className="text-muted">{product.cantidad} disponibles</span>
-            </footer>
+            {getPriceInDollars(product.precio)} {showInUSD ? 'USD' : 'CLP'}
+            <div role='grid'>
+                <span className="text-muted">{product.cantidad} disponibles</span>
+                <button className="btn btn-dark">Agregar al carrito</button>
+            </div>
         </article>
     );
 }

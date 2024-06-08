@@ -1,6 +1,6 @@
 export default function Header() {
     return (
-        <div>
+        <div class="container">
           <nav>
             <ul>
               <li><strong><h1>Ferremas</h1></strong></li>
