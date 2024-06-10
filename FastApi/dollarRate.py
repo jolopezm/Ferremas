@@ -5,9 +5,13 @@ import requests
 def get_dollar_rate():
     # Obtener la fecha actual en el formato YYYY-MM-DD
     today = datetime.today()
+    today_str = today.strftime('%Y-%m-%d')
+    
     yesterday = today - timedelta(days=1)
     yesterday_str = yesterday.strftime('%Y-%m-%d')
-    today_str = today.strftime('%Y-%m-%d')
+
+    tomorrow = today + timedelta(days=1)
+    tomorrow_str = tomorrow.strftime('%Y-%m-%d')
 
     # Credenciales de usuario y código de serie
     user = "joselopezmignone7@gmail.com"
@@ -15,7 +19,7 @@ def get_dollar_rate():
     timeseries = "F073.TCO.PRE.Z.D"  # Código de serie del dólar
     url_2 = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user=joselopezmignone7@gmail.com&pass=bCentral**11&function=GetSeries&timeseries=F073.TCO.PRE.Z.D&firstdate=2024-06-08&lastdate=2024-06-08'
     # URL de la API
-    url = f"https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user={user}&pass={password}&function=GetSeries&timeseries={timeseries}&firstdate={yesterday_str}&lastdate={yesterday_str}"
+    url = f"https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user={user}&pass={password}&function=GetSeries&timeseries={timeseries}&firstdate={tomorrow_str}&lastdate={tomorrow_str}"
 
     try:
         # Realizar la solicitud

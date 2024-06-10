@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Payment from "../components/Payment";
-import { initTransaction } from '../Api';
+import { initTransaction } from '../API';
 
 export default function About() {
   const [transactionData, setTransactionData] = useState(null);

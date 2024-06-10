@@ -5,26 +5,26 @@ export default function Footer() {
         <footer className="container-fluid">
             <div className="grid">
                 <div>
-                    <h3>Company Name</h3>
-                    <p>Leading provider of construction tools and materials.</p>
+                    <h3>Ferremas</h3>
+                    <p>Proveedor lider en herramientas y materiales para construcción.</p>
                 </div>
                 <div>
-                    <h3>Quick Links</h3>
+                    <h3>Accesos rápidos</h3>
                     <ul>
                         <li><a href="#">Home</a></li>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Sobre nosotros</a></li>
+                        <li><a href="#">Servicios</a></li>
+                        <li><a href="#">Contacto</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3>Contact Us</h3>
-                    <p>Email: info@company.com</p>
-                    <p>Phone: +1 123 456 7890</p>
-                    <p>Address: 1234 Street Name, City, Country</p>
+                    <h3>Contacto</h3>
+                    <p>Email: info@ferremas.com</p>
+                    <p>Teléfono: +56 9 12345678</p>
+                    <p>Dirección: Antonio Varas 666, Providencia, Región Metropolitana</p>
                 </div>
                 <div>
-                    <h3>Follow Us</h3>
+                    <h3>Síganos</h3>
                     <ul className="social">
                         <li><a href="#">Facebook</a></li>
                         <li><a href="#">Twitter</a></li>
@@ -34,7 +34,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className="text-center">
-                <p>&copy; {new Date().getFullYear()} Company Name. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} Ferremas. Todos los derechos reservados.</p>
             </div>
         </footer>
     );

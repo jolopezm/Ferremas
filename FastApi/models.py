@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, LargeBinary, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, LargeBinary, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 import base64
 
@@ -44,21 +44,17 @@ class Producto(Base):
             "categoria_id": self.categoria_id
         }
     
-class Cliente(Base):
-    __tablename__ = "cliente"
+class Usuario(Base):
+    __tablename__ = "usuario"
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, index=True)
-    email = Column(String)
-    password = Column(String)
-    direccion = Column(String)
-    is_logged_in = Column(Boolean, default=False)
+    email = Column(String, unique=True)
+    hashed_password = Column(String)
 
     def as_dict(self):
         return {
             "id": self.id,
             "nombre": self.nombre,
             "email": self.email,
-            "password": self.password,
-            "direccion": self.direccion,
-            "is_logged_in": self.is_logged_in
+            "hashed_password": self.hashed_password
         }

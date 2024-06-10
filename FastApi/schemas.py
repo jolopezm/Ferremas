@@ -7,11 +7,10 @@ class ProductoBase(BaseModel):
     descripcion: str
     categoria_id: int
 
-class ClienteBase(BaseModel):
+class UsuarioBase(BaseModel):
     nombre: str
     email: str
     password: str
-    direccion: str
 
 class TransactionRequestBase(BaseModel):
     buy_order: str

@@ -13,16 +13,16 @@ export default function Filter({ showInUSD, onShowInUSDChange, categories, onCat
     return (
         <div role="group">
             <details className="dropdown">
-                <summary>Región</summary>
-                <ul>
+                <summary className="summary-small">Región</summary>
+                <ul className="summary-small">
                     <li>
                         <ShowInUSD showInUSD={showInUSD} onShowInUSDChange={onShowInUSDChange} />
                     </li>
                 </ul>
             </details>
             <details className="dropdown">
-                <summary>Categoría</summary>
-                <ul>
+                <summary className="summary-small">Categoría</summary>
+                <ul className="summary-small">
                     <li>
                         <label>
                             <input
@@ -50,8 +50,8 @@ export default function Filter({ showInUSD, onShowInUSDChange, categories, onCat
                 </ul>
             </details>
             <details className="dropdown">
-                <summary>Ordenar por</summary>
-                <ul>
+                <summary className="summary-small">Ordenar por</summary>
+                <ul className="summary-small">
                     <li>
                         <label>
                             <input

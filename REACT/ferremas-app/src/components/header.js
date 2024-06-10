@@ -1,16 +1,39 @@
-export default function Header() {
-    return (
-        <div class="container">
-          <nav>
-            <ul>
-              <li><strong><h1>Ferremas</h1></strong></li>
-            </ul>
-            <ul>
-              <li><a href="http://localhost:3000/home">Home</a></li>
-              <li><a href="http://localhost:3000/about">About</a></li>
-              <li><a href="http://localhost:3000/docs">Docs</a></li>
-            </ul>
-          </nav>
-      </div>
-    )
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function Header({ username }) {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <div className="container">
+      <nav>
+        <ul>
+          <li><strong><h3>Ferremas</h3></strong></li>
+        </ul>
+        <ul>
+          <li><a href="http://localhost:3000/home">Home</a></li>
+          <li><a href="http://localhost:3000/about">About</a></li>
+          {isAuthenticated ? (
+            <li>
+              <details className='dropdown'>
+                <summary className="summary-small">{username}</summary>
+                <ul className="dropdown-content summary-small">
+                  <li><a onClick={handleLogout}>Logout</a></li>
+                </ul>
+              </details>
+            </li>
+          ) : (
+            <li><a href="http://localhost:3000/login">Login</a></li>
+          )}
+        </ul>
+      </nav>
+    </div>
+  );
 }
