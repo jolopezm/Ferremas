@@ -19,7 +19,7 @@ def get_dollar_rate():
     timeseries = "F073.TCO.PRE.Z.D"  # Código de serie del dólar
     url_2 = 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user=joselopezmignone7@gmail.com&pass=bCentral**11&function=GetSeries&timeseries=F073.TCO.PRE.Z.D&firstdate=2024-06-08&lastdate=2024-06-08'
     # URL de la API
-    url = f"https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user={user}&pass={password}&function=GetSeries&timeseries={timeseries}&firstdate={tomorrow_str}&lastdate={tomorrow_str}"
+    url = f"https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx?user={user}&pass={password}&function=GetSeries&timeseries={timeseries}&firstdate={today_str}&lastdate={today_str}"
 
     try:
         # Realizar la solicitud
