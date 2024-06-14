@@ -58,3 +58,12 @@ class Usuario(Base):
             "email": self.email,
             "hashed_password": self.hashed_password
         }
+    
+class Transaccion(Base):
+    __tablename__ = 'transaccion'
+    token = Column(String, primary_key=True, index=True)
+
+    def as_dict(self):
+        return {
+            'token': self.token
+        }

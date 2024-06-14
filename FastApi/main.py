@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -7,17 +7,22 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Annotated, Optional
 
-from db import engine
+from db import engine, session
 from dollarRate import get_dollar_rate
 from initTransaction import init_transaction
 
-import models, os, schemas, userAuth
+import models, os, schemas, userAuth, asyncio
+
+def get_db():
+    db = session()
+    try:
+        yield db
+    finally:
+        db.close()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
-imagenes_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'REACT', 'imagenes')
-app.mount("/imagenes", StaticFiles(directory=imagenes_directory), name="imagenes")
 
 origins = [
     'http://localhost:3000'
@@ -33,7 +38,7 @@ app.add_middleware(
 
 models.Base.metadata.create_all(bind=engine)
 
-db_dependecy = Annotated[Session, Depends(userAuth.get_db)]
+db_dependency = Annotated[Session, Depends(userAuth.get_db)]
 
 @app.get("/productos")
 async def get_productos(db: Session = Depends(userAuth.get_db)):
@@ -45,7 +50,7 @@ async def get_productos(db: Session = Depends(userAuth.get_db)):
         raise HTTPException(status_code=500, detail=f"Error al obtener productos: {e}")
 
 @app.get("/productos/{item_id}")
-async def get_producto_by_id(item_id: int, db: db_dependecy):
+async def get_producto_by_id(item_id: int, db: db_dependency):
     producto = db.query(models.Producto).filter_by(id=item_id).first()
     if producto is None:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
@@ -208,3 +213,69 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 @app.get("/verify-token/{token}")
 async def verify_user_token(token: str):
     return await userAuth.verify_user_token(token)
+
+@app.post("/transaccion/{token}", response_model=schemas.TransaccionBase)
+async def create_transaccion(token: str, db: Session = Depends(userAuth.get_db)):
+    try:
+        # Verifica si ya existe una transacción con este token en la base de datos
+        existing_transaccion = db.query(models.Transaccion).filter(models.Transaccion.token == token).first()
+        if existing_transaccion:
+            raise HTTPException(status_code=400, detail="Ya existe una transacción con este token")
+
+        # Crea una nueva transacción en la base de datos
+        db_transaccion = models.Transaccion(token=token)
+        db.add(db_transaccion)
+        db.commit()
+        db.refresh(db_transaccion)
+
+        return db_transaccion
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear la transacción: {e}")
+
+# Endpoint para limpiar la tabla de transacciones manualmente (para pruebas)
+@app.post("/clean-transactions", response_model=None)
+async def clean_transactions_endpoint(db: Session = Depends(get_db)):
+    try:
+        db.query(models.Transaccion).delete()
+        db.commit()
+        return {"message": "Tabla de transacciones limpiada correctamente"}
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al limpiar la tabla de transacciones: {e}")
+
+# Función para limpiar la tabla de transacciones
+async def clean_transactions(db: Session):
+    try:
+        db.query(models.Transaccion).delete()
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+
+# Función para programar la limpieza cada 5 minutos
+async def schedule_cleaning(get_db):
+    while True:
+        db = next(get_db())  # Obtener una instancia de Session
+        try:
+            await clean_transactions(db)
+        finally:
+            db.close()
+        await asyncio.sleep(600)  # Espera 10 minutos
+
+# Iniciar la programación de la limpieza de transacciones
+@app.on_event("startup")
+async def startup_event():
+    # Iniciar la tarea de limpieza cada 5 minutos
+    asyncio.create_task(schedule_cleaning(get_db))
+
+@app.get("/transaccion/{token}")
+async def get_transaccion(token: str, db: Session = Depends(userAuth.get_db)):
+    try:
+        existing_transaccion = db.query(models.Transaccion).filter(models.Transaccion.token == token).first()
+        if not existing_transaccion:
+            raise HTTPException(status_code=400, detail="No existe una transacción con este token")
+        transaccion = db.query(models.Transaccion).filter(models.Transaccion.token == token).first()
+        return {"transacciones": transaccion}
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener transacciones: {e}")

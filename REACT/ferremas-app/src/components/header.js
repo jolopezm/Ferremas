@@ -15,7 +15,9 @@ export default function Header({ username }) {
     <div className="container">
       <nav>
         <ul>
-          <li><strong><h3>Ferremas</h3></strong></li>
+          <li>
+            <img src="/imagenes/image.png" alt="Ferremas Logo" className="logo" />
+          </li>
         </ul>
         <ul>
           <li><a href="http://localhost:3000/home">Home</a></li>
@@ -23,7 +25,9 @@ export default function Header({ username }) {
           {isAuthenticated ? (
             <li>
               <details className='dropdown'>
-                <summary className="summary-small">{username}</summary>
+                <summary className="summary-small">
+                  <span className="simple-icons--user"></span>{username}
+                </summary>
                 <ul className="dropdown-content summary-small">
                   <li><a onClick={handleLogout}>Logout</a></li>
                 </ul>
