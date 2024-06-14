@@ -3,3 +3,7 @@ cryptography
 python-jose
 python-multipart
 passlib
+fastapi
+sqlalchemy
+psycopg2
+transbank-sdk
