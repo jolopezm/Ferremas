@@ -1,10 +1,18 @@
-import React from 'react';
+// src/components/Header.js
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function Header({ username }) {
+  const { cart } = useCart();
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [active, setActive] = useState(false);
+
+  const quantity = cart.reduce((acc, curr) => {
+    return acc + curr.quantity;
+  }, 0);
 
   const handleLogout = () => {
     logout();
@@ -12,7 +20,7 @@ export default function Header({ username }) {
   };
 
   return (
-    <div className="container">
+    <div>
       <nav>
         <ul>
           <li>
@@ -25,17 +33,19 @@ export default function Header({ username }) {
           {isAuthenticated ? (
             <li>
               <details className='dropdown'>
-                <summary className="summary-small">
-                  <span className="simple-icons--user"></span>{username}
-                </summary>
+                <summary className="summary-small"></summary>
                 <ul className="dropdown-content summary-small">
-                  <li><a onClick={handleLogout}>Logout</a></li>
+                  <li><button onClick={handleLogout}>Logout</button></li>
                 </ul>
               </details>
             </li>
           ) : (
             <li><a href="http://localhost:3000/login">Login</a></li>
           )}
+          <li>
+            <a href='/carrito' onClick={() => setActive(!active)}>Carrito</a>
+            <span> {quantity}</span>
+          </li>
         </ul>
       </nav>
     </div>

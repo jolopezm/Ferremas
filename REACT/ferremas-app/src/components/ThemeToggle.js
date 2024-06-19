@@ -16,13 +16,18 @@ export default function ThemeToggle() {
   };
 
   return (
-    <>
-      <fieldset>
-        <label>
-          <input name="terms" type="checkbox" role="switch" onChange={toggleTheme} checked={theme === 'dark'} />
-          {theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-        </label>
-      </fieldset>
-    </>
+    <fieldset>
+      <label>
+        <input
+          name="terms"
+          type="checkbox"
+          role="switch"
+          onChange={toggleTheme}
+          checked={theme === 'dark'}
+        />
+        {theme === 'light' ? 'Modo claro' : 'Modo oscuro'}
+      </label>
+    </fieldset>
   );
 }
+  

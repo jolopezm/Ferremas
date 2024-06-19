@@ -4,6 +4,10 @@ const api = axios.create({
     baseURL: 'http://localhost:8000',
 });
 
+export const numberWithPoints = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 export const initTransaction = async (data) => {
     const response = await fetch('http://localhost:8000/api/init-transaction', {
         method: 'POST',
@@ -30,12 +34,12 @@ export const createTransaction = async (token) => {
 };
 
 export const searchTransactionToken = async (token) => {
-  try {
-    const response = await api.get(`/transaccion/${token}`);
-    return response.data;
-  } catch (error) {
-      throw new Error(`Error fetching transactions: ${error.message}`);
-  }
-}
+    try {
+        const response = await api.get(`/transaccion/${token}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(`Error fetching transactions: ${error.message}`);
+    }
+};
 
 export default api;

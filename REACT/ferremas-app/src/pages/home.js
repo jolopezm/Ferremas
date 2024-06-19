@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from "../components/Header";
-import ProductCard from "../components/ProductCard";
+import ProductList from "../components/ProductList";
 import Filter from "../components/Filter";
-import Footer from "../components/Footer";
-import ThemeToggle from '../components/ThemeToggle'; // Import the ThemeToggle component
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -86,44 +83,29 @@ export default function Home() {
   });
 
   return (
-    <>
-      <div className="container">
-        <Header />
-        <h4 className="text-center">Nuestro catálogo</h4>
-        <form role="search" onSubmit={(e) => e.preventDefault()}>
-          <input 
-            name="search" 
-            type="search" 
-            placeholder="Search" 
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </form>
-        <Filter
-          showInUSD={showInUSD}
-          onShowInUSDChange={handleShowInUSDChange}
-          categories={categories}
-          onCategoryChange={handleCategoryChange}
-          onSortChange={handleSortChange}
+    <div>
+      <h4 className="text-center">Nuestro catálogo</h4>
+      <form role="search" onSubmit={(e) => e.preventDefault()}>
+        <input 
+          name="search" 
+          type="search" 
+          placeholder="Search" 
+          value={searchTerm}
+          onChange={handleSearchChange}
         />
-        <div>
-          <div className="basic-grid container-fluid">
-            {sortedProducts.length > 0 ? (
-              sortedProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  showInUSD={showInUSD} 
-                  dollarRate={dollarRate} 
-                />
-              ))
-            ) : (
-              <p>No se encontraron productos.</p>
-            )}
-          </div>
-        </div><br></br><hr></hr>
-        <Footer />
-      </div>
-    </>
+      </form>
+      <Filter
+        showInUSD={showInUSD}
+        onShowInUSDChange={handleShowInUSDChange}
+        categories={categories}
+        onCategoryChange={handleCategoryChange}
+        onSortChange={handleSortChange}
+      />
+      <ProductList 
+        products={sortedProducts} 
+        showInUSD={showInUSD} 
+        dollarRate={dollarRate} 
+      />
+    </div>
   );
 }

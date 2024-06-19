@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from './Header';
 import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
@@ -57,8 +56,7 @@ function Login() {
 
   return (
     <div>
-      <Header username={username} /> {/* Pasar el nombre de usuario como prop */}
-      <article className="container" style={{ maxWidth: '350px', margin: '2rem auto' }}>
+      <article style={{ maxWidth: '350px', margin: '2rem auto' }}>
         <form onSubmit={handleSubmit} style={{ maxWidth: '300px', margin: '0 auto' }}>
           <div>
             <label htmlFor="username">Username:</label>

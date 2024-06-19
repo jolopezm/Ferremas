@@ -1,0 +1,125 @@
+// Variables de color
+$light-bg-page: #eff1f4; // Fondo de la página en modo claro
+$dark-bg-page: #121212; // Fondo de la página en modo oscuro
+$light-bg-card: #fff; // Fondo de la tarjeta en modo claro
+$dark-bg-card: #333; // Fondo de la tarjeta en modo oscuro
+$light-text-color: #000; // Color de texto en modo claro
+$dark-text-color: #fff; // Color de texto en modo oscuro
+
+// Mixin para estilos de tema
+@mixin theme-styles($bg-color-page, $bg-color-card, $text-color) {
+  background-color: $bg-color-page;
+  color: $text-color;
+
+  .product-card {
+    background-color: $bg-color-card;
+  }
+}
+
+// Estilos por defecto (modo claro)
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $light-bg-page;
+  color: $light-text-color;
+
+  .product-card {
+    background-color: $light-bg-card;
+  }
+}
+
+// Estilos para modo oscuro
+[data-theme='dark'] body {
+  @include theme-styles($dark-bg-page, $dark-bg-card, $dark-text-color);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-img {
+  border-radius: 5px;
+  height: 150px;
+  text-align: center;
+  margin: 0 auto; // Centrar la imagen horizontalmente
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-name {
+  max-width: 30ch; // Limitar la longitud a 30 caracteres
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-small {
+  font-size: 0.85em;
+}
+
+.btn-small {
+  width: 100%; // Hacer que el botón ocupe todo el ancho de la tarjeta
+  padding: 0.3rem;
+  font-size: 0.875rem;
+  background-color: #007bff; // Color de fondo del botón
+  color: #fff; // Color de texto del botón
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3; // Color de fondo más oscuro al pasar el mouse
+  }
+}
+
+.basic-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+}
+
+.logo {
+  width: 15em;
+  height: auto;
+}
+
+hr {
+  border: none; /* Elimina el borde predeterminado */
+  height: 1px; /* Altura de la línea */
+  background-color: #000; /* Color de la línea */
+  margin: 20px 0; /* Márgenes superior e inferior */
+}
+
+.navbar {
+  background-color: #0056b3;
+}
+
+.cuantificador {
+  text-align: center;
+  border: 1px solid black;
+
+  button {
+    border: none;
+    cursor: pointer;
+    background: none;
+    color: #000;
+
+    &:hover {
+      background-color: #b9b9b9;
+    }
+  }
+}
