@@ -14,18 +14,19 @@ export const CartProvider = ({ children }) => {
   }, [cart]);
 
   const addToCart = (product) => {
+    const { id, nombre, precio } = product; // Solo las propiedades necesarias
     setCart((currentItems) => {
-      const isItemFound = currentItems.find((item) => item.id === product.id);
+      const isItemFound = currentItems.find((item) => item.id === id);
       if (isItemFound) {
         return currentItems.map((item) => {
-          if (item.id === product.id) {
+          if (item.id === id) {
             return { ...item, quantity: item.quantity + 1 };
           } else {
             return item;
           }
         });
       } else {
-        return [...currentItems, { ...product, quantity: 1 }];
+        return [...currentItems, { id, nombre, precio, quantity: 1 }];
       }
     });
   };

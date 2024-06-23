@@ -1,4 +1,3 @@
-// src/components/Product.js
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { numberWithPoints } from '../API';
@@ -12,7 +11,7 @@ export default function Product({ product, showInUSD, dollarRate, onAdd, onRemov
 
   const getPriceInDollars = (price) => {
     if (showInUSD && dollarRate) {
-      return (price / dollarRate).toFixed(2);
+      return (price / dollarRate * 1000).toFixed(2);
     }
     return price;
   };
@@ -25,16 +24,18 @@ export default function Product({ product, showInUSD, dollarRate, onAdd, onRemov
     if (onRemove) onRemove(product.id);
   };
 
-  // Calcular el precio total del producto
+
+  const defaultImageUrl = 'https://res.cloudinary.com/drsfnq5io/image/upload/v1719020941/img-productos-ferremas/image_gzb0wu.png';
+  const productImageUrl = product.imagen_url || defaultImageUrl;
   const totalPrice = product.precio * product.quantity;
 
   return (
     <article className="product-card">
       <div>
-        <img src={product.imagen_url} className="product-img" alt="Imagen no disponible" />
+        <img src={productImageUrl} className="product-img" alt="Imagen no disponible" />
         <div className="product-info">
           <p className="product-name">{product.nombre}</p>
-          <div>{getPriceInDollars(product.precio)} {showInUSD ? 'USD' : 'CLP'}</div>
+          <div>{getPriceInDollars(numberWithPoints(product.precio))} {showInUSD ? 'USD' : 'CLP'}</div>
           <div role="grid">
             <span className="text-muted summary-small"><p>{product.cantidad} disponibles</p></span>
             {isInCart ? (
@@ -48,7 +49,7 @@ export default function Product({ product, showInUSD, dollarRate, onAdd, onRemov
                     +
                   </button>
                 </div>
-                <div>${numberWithPoints(totalPrice)}</div>
+                <div>{numberWithPoints(totalPrice)} {showInUSD ? 'USD' : 'CLP'}</div>
               </div>
             ) : (
               <button className="btn-small" onClick={handleAddToCart}>

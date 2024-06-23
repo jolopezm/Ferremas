@@ -89,7 +89,7 @@ export default function Home() {
         <input 
           name="search" 
           type="search" 
-          placeholder="Search" 
+          placeholder="Buscar por nombre" 
           value={searchTerm}
           onChange={handleSearchChange}
         />

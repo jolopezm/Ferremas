@@ -43,8 +43,10 @@ export default function Header({ username }) {
             <li><a href="http://localhost:3000/login">Login</a></li>
           )}
           <li>
-            <a href='/carrito' onClick={() => setActive(!active)}>Carrito</a>
-            <span> {quantity}</span>
+            <a href='/carrito' onClick={() => setActive(!active)}>
+              <span className="bi--cart"></span>
+              <span> {quantity}</span>
+            </a>
           </li>
         </ul>
       </nav>

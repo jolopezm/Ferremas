@@ -24,3 +24,8 @@ async def init_transaction(data: dict):
         "url": resp['url'],
         "token": resp['token']
     }
+
+async def commit_transaction(token):
+    tx = Transaction(WebpayOptions(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, IntegrationType.TEST))
+    response = tx.commit(token)
+    return response

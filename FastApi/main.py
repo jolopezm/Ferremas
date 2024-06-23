@@ -6,12 +6,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Annotated, Optional
+from datetime import datetime
 
 from db import engine, session
 from dollarRate import get_dollar_rate
-from initTransaction import init_transaction
+from initTransaction import commit_transaction, init_transaction
+from schemas import ConfirmTransactionRequest, OrdenCompraBase, DetalleOrdenCompraBase, UsuarioBase, TransaccionBase, Token
+from models import OrdenCompra, Producto, DetalleOrdenCompra, Usuario
 
-import models, os, schemas, userAuth, asyncio
+import models, userAuth, asyncio, schemas
 
 def get_db():
     db = session()
@@ -96,8 +99,11 @@ async def create_producto(
 
 @app.get("/dollar-rate")
 def read_dollar_rate():
-    rate = get_dollar_rate()
-    return {"dollar_rate": rate}
+    try:
+        rate = get_dollar_rate()
+        return {"dollar_rate": rate}
+    except HTTPException as e:
+        return 910
     
 @app.put("/actualiza-producto/{producto_id}")
 async def update_producto(
@@ -149,7 +155,7 @@ async def init_transaction_endpoint(data: dict):
 
 @app.post("/usuario")
 async def registro_usuario(
-    usuario: schemas.UsuarioBase, 
+    usuario: UsuarioBase, 
     db: Session = Depends(userAuth.get_db)
 ):
     try:
@@ -206,7 +212,7 @@ async def get_categorias(db: Session = Depends(userAuth.get_db)):
     categorias = db.query(models.Categoria).all()
     return {"categorias": [categoria.as_dict() for categoria in categorias]}
 
-@app.post("/token", response_model=schemas.Token)
+@app.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(userAuth.get_db)):
     return userAuth.login_for_access_token(form_data, db)
 
@@ -214,7 +220,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 async def verify_user_token(token: str):
     return await userAuth.verify_user_token(token)
 
-@app.post("/transaccion/{token}", response_model=schemas.TransaccionBase)
+@app.post("/transaccion/{token}", response_model=TransaccionBase)
 async def create_transaccion(token: str, db: Session = Depends(userAuth.get_db)):
     try:
         # Verifica si ya existe una transacción con este token en la base de datos
@@ -279,3 +285,54 @@ async def get_transaccion(token: str, db: Session = Depends(userAuth.get_db)):
         return {"transacciones": transaccion}
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener transacciones: {e}")
+    
+@app.post("/ordenes/", response_model=OrdenCompraBase)
+def create_orden(orden: OrdenCompraBase, db: Session = Depends(get_db)):
+    try:
+        db_orden = OrdenCompra(
+            id=orden.id,
+            fecha_compra=orden.fecha_compra,
+            usuario_id=orden.usuario_id
+        )
+        db.add(db_orden)
+        db.commit()
+        db.refresh(db_orden)
+        return db_orden
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear la orden de compra: {e}")
+
+
+
+@app.post("/detalles_ordenes/", response_model=DetalleOrdenCompraBase)
+def create_order_detail(detail: DetalleOrdenCompraBase, db: Session = Depends(get_db)):
+    try:
+        db_detail = DetalleOrdenCompra(
+            orden_id=detail.orden_id,
+            producto_id=detail.producto_id,
+            cantidad=detail.cantidad
+        )
+        db.add(db_detail)
+        db.commit()
+        db.refresh(db_detail)
+        return db_detail
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear el detalle de orden de compra: {e}")
+
+@app.get("/api/check-order-code/{code}")
+def check_order_code(code: str, db: Session = Depends(get_db)):
+    try:
+        order = db.query(models.OrdenCompra).filter(models.OrdenCompra.id == code).first()
+        if order:
+            return {"exists": True}
+        else:
+            return {"exists": False}
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=f"Error al verificar código de orden de compra: {e}")
+    
+@app.post("/confirm-transaction/{token_data}")
+async def confirm_transaction(token_data: str):
+    try:
+        resp = await commit_transaction(token_data)
+        return resp
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al confirmar la transacción: {e}")
